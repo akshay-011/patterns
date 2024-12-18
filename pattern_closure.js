@@ -11,25 +11,29 @@ const range = function (start, end, step) {
 const repeat = function (character) {
   return function (times) {
     return character.repeat(times);
-  }
+  };
 };
 
 const stars = repeat("*");
 const spaces = repeat(" ");
-// const hollowLine = 
+
+const hollowLine = function (length) {
+  return stars(1) + spaces(length - 2) + stars(1);
+};
 
 const filledRectangle = function ([row, column]) {
   const rectangle = Array(column).fill(row);
   return rectangle.map(stars);
-}
+};
 
 const hollowRectangle = function ([row, column]) {
+  const rectangle = filledRectangle([row, column]);
   if (row < 3 || column < 3) {
-    return filledRectangle([row, column]);
+    return rectangle;
   }
 
-  return [];
-}
+  return rectangle.fill(hollowLine(row), 1, -1);
+};
 
 function generatePattern(style1, dimensions, style2) {
   if (dimensions[0] === 0 || dimensions[1] === 0) {
@@ -78,7 +82,7 @@ const hollowRectangleTestCases = [
   ['hollow-rectangle', [3, 4], "", '***\n* *\n* *\n***'],
   ['hollow-rectangle', [4, 4], "", '****\n*  *\n*  *\n****'],
   ['hollow-rectangle', [3, 6], "", '***\n* *\n* *\n* *\n* *\n***'],
-]
+];
 
 const alternatingRectangleTestCases = [
   ['alternating-rectangle', [1, 1], "", '*'],
@@ -155,7 +159,7 @@ const allTestCases = [
 
 const printStatus = function (allTestCases, failed) {
   console.log("Failed :", failed.length, " / ", allTestCases.length);
-}
+};
 
 function testAll() {
   const failed = allTestCases.reduce(testGeneratePattern, []);
