@@ -65,14 +65,16 @@ const alternatingRectangle = function ([rows, columns], lines) {
   return Array(columns).fill(rows).map(alternatingLine);
 };
 
-const alignRight = function (length) {
+const alignRight = function (length, filler) {
   return function (string) {
-    return string.padStart(length);
+    return string.padStart(length, filler);
   };
 };
 
-const triangle = function ([base]) {
-  return range(1, base + 1, 1).map(stars);
+const triangle = function ([base], filler) {
+  const aligner = alignRight(base, filler);
+
+  return range(1, base + 1, 1).map(stars).map(aligner);
 };
 
 function addContinousCharacter(character, init, incrementor) {
@@ -120,12 +122,11 @@ const rectanglePattern = function (style, dimensions) {
 
 const singleDimension = function (style, dimensions) {
   if (style === "triangle") {
-    return triangle(dimensions);
+    return triangle(dimensions, "");
   }
 
   if (style === 'right-aligned-triangle') {
-    const aligner = alignRight(dimensions[0]);
-    return triangle(dimensions).map(aligner);
+    return triangle(dimensions, " ");
   }
 
   if (style === "diamond") {
