@@ -19,6 +19,10 @@ const dashes = repeat("-");
 const spaces = repeat(" ");
 
 const hollowLine = function (length) {
+  if (length < 3) {
+    return stars(length);
+  }
+
   return stars(1) + spaces(length - 2) + stars(1);
 };
 
@@ -71,6 +75,29 @@ const triangle = function ([base]) {
   return range(1, base + 1, 1).map(stars);
 };
 
+function addContinousCharacter(character, init, incrementor) {
+  return function (string) {
+    const charCount = init + string.length;
+    init += incrementor;
+
+    return string.padStart(charCount, character);
+  };
+}
+
+const pyramid = function (base, line) {
+  const baseFrame = range(1, base + 1, 2).map(line).reverse();
+  const aligner = addContinousCharacter(spaces(1), 0, 1);
+
+  return baseFrame.map(aligner).reverse();
+};
+
+function diamond([base], lineStyle) {
+  const upper = pyramid(base, lineStyle);
+  const bottom = upper.slice(0, -1).reverse();
+
+  return [...upper, ...bottom];
+}
+
 const rectanglePattern = function (style, dimensions) {
   if (style === "filled-rectangle") {
     return filledRectangle(dimensions);
@@ -101,7 +128,14 @@ const singleDimension = function (style, dimensions) {
     return triangle(dimensions).map(aligner);
   }
 
-  return [];
+  if (style === "diamond") {
+    return diamond(dimensions, stars);
+  }
+
+  if (style === "hollow-diamond") {
+    return diamond(dimensions, hollowLine);
+  }
+
 };
 
 const makePatterns = function (style, dimensions) {
