@@ -15,24 +15,60 @@ const repeat = function (character) {
 };
 
 const stars = repeat("*");
+const dashes = repeat("-");
 const spaces = repeat(" ");
 
 const hollowLine = function (length) {
   return stars(1) + spaces(length - 2) + stars(1);
 };
 
-const filledRectangle = function ([row, column]) {
-  const rectangle = Array(column).fill(row);
-  return rectangle.map(stars);
+const filledRectangle = function ([rows, columns]) {
+  return Array(columns).fill(rows).map(stars);
 };
 
-const hollowRectangle = function ([row, column]) {
-  const rectangle = filledRectangle([row, column]);
-  if (row < 3 || column < 3) {
+const hollowRectangle = function ([rows, columns]) {
+  const rectangle = filledRectangle([rows, columns]);
+  if (rows < 3 || columns < 3) {
     return rectangle;
   }
 
-  return rectangle.fill(hollowLine(row), 1, -1);
+  return rectangle.fill(hollowLine(rows), 1, -1);
+};
+
+const cycle = function (end) {
+  let index = -1;
+
+  return function () {
+    index = index + 1;
+    if (index >= end) {
+      index = 0;
+    }
+
+    return index;
+  };
+};
+
+function chooseLine(array) {
+  const chooseIndex = cycle(array.length);
+
+  return function (number) {
+    return array[chooseIndex()](number);
+  };
+}
+
+const alternatingRectangle = function ([rows, columns], lines) {
+  const alternatingLine = chooseLine(lines);
+  return Array(columns).fill(rows).map(alternatingLine);
+};
+
+const alignRight = function (length) {
+  return function (string) {
+    return string.padStart(length);
+  };
+};
+
+const triangle = function ([base]) {
+  return range(1, base + 1, 1).map(stars);
 };
 
 function generatePattern(style1, dimensions, style2) {
@@ -46,6 +82,19 @@ function generatePattern(style1, dimensions, style2) {
 
   if (style1 === "hollow-rectangle") {
     return hollowRectangle(dimensions).join("\n");
+  }
+
+  if (style1 === 'alternating-rectangle') {
+    return alternatingRectangle(dimensions, [stars, dashes]).join("\n");
+  }
+
+  if (style1 === "triangle") {
+    return triangle(dimensions).join("\n");
+  }
+
+  if (style1 === 'right-aligned-triangle') {
+    const aligner = alignRight(dimensions[0]);
+    return triangle(dimensions).map(aligner).join("\n");
   }
 
   return "";
