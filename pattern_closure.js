@@ -84,6 +84,10 @@ const rectanglePattern = function (style, dimensions) {
     return alternatingRectangle(dimensions, [stars, dashes]);
   }
 
+  if (style === 'spaced-alternating-rectangle') {
+    return alternatingRectangle(dimensions, [stars, dashes, spaces]);
+  }
+
   return [];
 };
 
