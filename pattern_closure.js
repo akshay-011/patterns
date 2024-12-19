@@ -18,25 +18,14 @@ const stars = repeat("*");
 const dashes = repeat("-");
 const spaces = repeat(" ");
 
+const LINES = [stars, dashes, spaces];
+
 const hollowLine = function (length) {
   if (length < 3) {
     return stars(length);
   }
 
   return stars(1) + spaces(length - 2) + stars(1);
-};
-
-const filledRectangle = function ([rows, columns]) {
-  return Array(columns).fill(rows).map(stars);
-};
-
-const hollowRectangle = function ([rows, columns]) {
-  const rectangle = filledRectangle([rows, columns]);
-  if (rows < 3 || columns < 3) {
-    return rectangle;
-  }
-
-  return rectangle.fill(hollowLine(rows), 1, -1);
 };
 
 const cycle = function (end) {
@@ -52,17 +41,28 @@ const cycle = function (end) {
   };
 };
 
-function chooseLine(array) {
-  const chooseIndex = cycle(array.length);
+function chooseLine(count) {
+  const changeIndex = cycle(count);
 
   return function (number) {
-    return array[chooseIndex()](number);
+    const index = changeIndex();
+    return LINES[index](number);
   };
 }
 
-const alternatingRectangle = function ([rows, columns], lines) {
-  const alternatingLine = chooseLine(lines);
-  return Array(columns).fill(rows).map(alternatingLine);
+const alternatingRectangle = function ([rows, columns], lineCount) {
+  const line = chooseLine(lineCount);
+
+  return Array(columns).fill(rows).map(line);
+};
+
+const hollowRectangle = function ([rows, columns]) {
+  const rectangle = alternatingRectangle([rows, columns], 1);
+  if (rows < 3 || columns < 3) {
+    return rectangle;
+  }
+
+  return rectangle.fill(hollowLine(rows), 1, -1);
 };
 
 const alignRight = function (length, filler) {
@@ -101,23 +101,18 @@ function diamond([base], lineStyle) {
 }
 
 const rectanglePattern = function (style, dimensions) {
-  if (style === "filled-rectangle") {
-    return filledRectangle(dimensions);
-  }
+  // TODO: styles into array use index as line count
+  const rectangleStyles = [
+    "hollow-rectangle", "filled-rectangle",
+    'alternating-rectangle', 'spaced-alternating-rectangle'
+  ];
 
-  if (style === "hollow-rectangle") {
+  const styleIndex = rectangleStyles.indexOf(style);
+  if (styleIndex === 0) {
     return hollowRectangle(dimensions);
   }
 
-  if (style === 'alternating-rectangle') {
-    return alternatingRectangle(dimensions, [stars, dashes]);
-  }
-
-  if (style === 'spaced-alternating-rectangle') {
-    return alternatingRectangle(dimensions, [stars, dashes, spaces]);
-  }
-
-  return [];
+  return alternatingRectangle(dimensions, styleIndex);
 };
 
 const singleDimension = function (style, dimensions) {
@@ -151,7 +146,6 @@ function generatePattern(style1, dimensions, style2) {
   if (dimensions[0] === 0 || dimensions[1] === 0) {
     return '';
   }
-
 
   return makePatterns(style1, dimensions).join("\n");
 }
