@@ -71,33 +71,50 @@ const triangle = function ([base]) {
   return range(1, base + 1, 1).map(stars);
 };
 
+const rectanglePattern = function (style, dimensions) {
+  if (style === "filled-rectangle") {
+    return filledRectangle(dimensions);
+  }
+
+  if (style === "hollow-rectangle") {
+    return hollowRectangle(dimensions);
+  }
+
+  if (style === 'alternating-rectangle') {
+    return alternatingRectangle(dimensions, [stars, dashes]);
+  }
+
+  return [];
+};
+
+const singleDimension = function (style, dimensions) {
+  if (style === "triangle") {
+    return triangle(dimensions);
+  }
+
+  if (style === 'right-aligned-triangle') {
+    const aligner = alignRight(dimensions[0]);
+    return triangle(dimensions).map(aligner);
+  }
+
+  return [];
+};
+
+const makePatterns = function (style, dimensions) {
+  if (dimensions.length === 1) {
+    return singleDimension(style, dimensions);
+  }
+
+  return rectanglePattern(style, dimensions);
+};
+
 function generatePattern(style1, dimensions, style2) {
   if (dimensions[0] === 0 || dimensions[1] === 0) {
     return '';
   }
 
-  if (style1 === "filled-rectangle") {
-    return filledRectangle(dimensions).join("\n");
-  }
 
-  if (style1 === "hollow-rectangle") {
-    return hollowRectangle(dimensions).join("\n");
-  }
-
-  if (style1 === 'alternating-rectangle') {
-    return alternatingRectangle(dimensions, [stars, dashes]).join("\n");
-  }
-
-  if (style1 === "triangle") {
-    return triangle(dimensions).join("\n");
-  }
-
-  if (style1 === 'right-aligned-triangle') {
-    const aligner = alignRight(dimensions[0]);
-    return triangle(dimensions).map(aligner).join("\n");
-  }
-
-  return "";
+  return makePatterns(style1, dimensions).join("\n");
 }
 
 // tesing part
