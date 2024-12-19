@@ -116,21 +116,20 @@ const rectanglePattern = function (style, dimensions) {
 };
 
 const singleDimension = function (style, dimensions) {
-  if (style === "triangle") {
-    return triangle(dimensions, "");
+  const singleDimensionsStyle = [
+    "diamond", "hollow-diamond",
+    "triangle", 'right-aligned-triangle',
+  ];
+
+  const lines = [stars, hollowLine];
+  const fillers = ["", " "];
+  const lineIndex = singleDimensionsStyle.indexOf(style);
+
+  if (lineIndex > 1) {
+    return triangle(dimensions, fillers[lineIndex % 2]);
   }
 
-  if (style === 'right-aligned-triangle') {
-    return triangle(dimensions, " ");
-  }
-
-  if (style === "diamond") {
-    return diamond(dimensions, stars);
-  }
-
-  if (style === "hollow-diamond") {
-    return diamond(dimensions, hollowLine);
-  }
+  return diamond(dimensions, lines[lineIndex]);
 
 };
 
